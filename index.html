@@ -31,7 +31,7 @@
         top: 0;
         width: 10px;
         height: 100vh;
-        background: #0ff;
+        /* background: #0ff; */
         z-index: 999;
     }
 
@@ -235,7 +235,7 @@ function createAsteroids(count) {
 function increaseAsteroids() {
     if (gameOver || win) return;
 
-    createAsteroids(5);   // ⭐ Har step me 5 aur add honge
+    createAsteroids(3.5);   // ⭐ Har step me 5 aur add honge
 
     // 6–7 second me next increase
     setTimeout(() => increaseAsteroids(), 6000);
