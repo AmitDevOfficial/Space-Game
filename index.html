@@ -15,15 +15,14 @@
     }
 
     #bgVideo {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover; /* video ko fullscreen crop ke sath fit karega */
-    z-index: -1; /* sab ke peeche rahega */
-}
-
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        z-index: -1;
+    }
 
     .start-line {
         position: fixed;
@@ -31,7 +30,6 @@
         top: 0;
         width: 10px;
         height: 100vh;
-        /* background: #0ff; */
         z-index: 999;
     }
 
@@ -69,40 +67,38 @@
         z-index: 1000;
     }
 
-    /* -------------control button------------- */
     #controls {
-    position: fixed;
-    bottom: 80px;
-    right: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    z-index: 2000;
-}
+        position: fixed;
+        bottom: 80px;
+        right: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        z-index: 2000;
+    }
 
-.mid-row {
-    display: flex;
-    gap: 75px;
-}
+    .mid-row {
+        display: flex;
+        gap: 75px;
+    }
 
-.btn {
-    width: 60px;
-    height: 60px;
-    background: rgba(0,255,255,0.7);
-    border: 2px solid #0ff;
-    color: #000;
-    font-size: 28px;
-    font-weight: bold;
-    border-radius: 12px;
-    cursor: pointer;
-    user-select: none;
-}
+    .btn {
+        width: 60px;
+        height: 60px;
+        background: rgba(0,255,255,0.7);
+        border: 2px solid #0ff;
+        color: #000;
+        font-size: 28px;
+        font-weight: bold;
+        border-radius: 12px;
+        cursor: pointer;
+        user-select: none;
+    }
 
-.btn:active {
-    background: #0ff;
-}
-
+    .btn:active {
+        background: #0ff;
+    }
 
 </style>
 </head>
@@ -129,12 +125,12 @@
 </div>
 
 
-
 <script>
+/* ------------------ Control Buttons -------------------- */
 function moveUp() { planet.vy = -speed; }
-function moveDown() { planet.vy = speed; }
+function moveDown() { planet.vy =  speed; }
 function moveLeft() { planet.vx = -speed; }
-function moveRight() { planet.vx = speed; }
+function moveRight() { planet.vx =  speed; }
 function stopX() { planet.vx = 0; }
 function stopY() { planet.vy = 0; }
 
@@ -147,33 +143,70 @@ document.querySelector(".up").addEventListener("mouseup", stopY);
 document.querySelector(".down").addEventListener("mouseup", stopY);
 document.querySelector(".left").addEventListener("mouseup", stopX);
 document.querySelector(".right").addEventListener("mouseup", stopX);
-
-// ⭐ MOBILE SUPPORT
-["up","down","left","right"].forEach(dir => {
-    let btn = document.querySelector("." + dir);
-
-    btn.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        if (dir === "up") moveUp();
-        if (dir === "down") moveDown();
-        if (dir === "left") moveLeft();
-        if (dir === "right") moveRight();
-    });
-
-    btn.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        stopX();
-        stopY();
-    });
-});
-
 </script>
+
 
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const restartBtn = document.getElementById("restartBtn");
 
+// --------- Background Music ---------
+const bgMusic = new Audio("space-music.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.4;
+
+// --------- blast Music ---------
+const blastSound = new Audio("over.mp3");
+blastSound.volume = 0.9;
+
+
+let rocketOutline = [];   // Final pixel outline
+
+
+/* ---------------------------------------------------
+    GET PIXEL-BASED OUTLINE FROM ROCKET IMAGE
+------------------------------------------------------*/
+function getImageOutline(image, w, h) {
+    let temp = document.createElement("canvas");
+    temp.width = w;
+    temp.height = h;
+    let tctx = temp.getContext("2d");
+
+    tctx.drawImage(image, 0, 0, w, h);
+    let imgData = tctx.getImageData(0, 0, w, h);
+    let pixels = imgData.data;
+    let outline = [];
+
+    for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+            let i = (y * w + x) * 4;
+            let alpha = pixels[i + 3];
+
+            if (alpha < 20) continue; // transparent skip
+
+            let neighbors = [
+                ((y - 1) * w + x) * 4 + 3,
+                ((y + 1) * w + x) * 4 + 3,
+                (y * w + (x - 1)) * 4 + 3,
+                (y * w + (x + 1)) * 4 + 3
+            ];
+
+            for (let n of neighbors) {
+                if (pixels[n] < 20) {
+                    outline.push({ x, y });
+                    break;
+                }
+            }
+        }
+    }
+    return outline;
+}
+
+
+/* ---------------------------------------------------
+    CANVAS SIZE
+------------------------------------------------------*/
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -181,23 +214,34 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
+
+/* ---------------------------------------------------
+    GAME VARIABLES
+------------------------------------------------------*/
 let planet;
 let asteroids;
 let gameOver;
 let win;
-
-let dragging = false;
 let speed = 1.7;
 
-// ⭐ Rocket Image
+
+/* ---------------------------------------------------
+    LOAD ROCKET IMAGE
+------------------------------------------------------*/
 const shipImg = new Image();
+shipImg.onload = () => {
+    rocketOutline = getImageOutline(shipImg, 100, 80);
+};
 shipImg.src = "rocket.png";
 
+
+/* ---------------------------------------------------
+    RESET GAME
+------------------------------------------------------*/
 function resetGame() {
     planet = {
-        x: 60,
+        x: 80,
         y: canvas.height / 2,
-        r: 18,
         vx: 0,
         vy: 0
     };
@@ -205,20 +249,23 @@ function resetGame() {
     asteroids = [];
     gameOver = false;
     win = false;
-
     restartBtn.style.display = "none";
 
-    createAsteroids(5);  // ⭐ Pehle bahut kam asteroids
-
-    // ⭐ 5 second baad automatically increase hoga
+    createAsteroids(5);
     setTimeout(() => increaseAsteroids(), 5000);
 
     animate();
+
+    bgMusic.play().catch(() => {});
 }
 
+
+/* ---------------------------------------------------
+    ASTEROIDS
+------------------------------------------------------*/
 function createAsteroids(count) {
     for (let i = 0; i < count; i++) {
-        let a = {
+        asteroids.push({
             x: canvas.width + Math.random() * 400,
             y: Math.random() * canvas.height,
             r: Math.random() * 30 + 15,
@@ -226,49 +273,62 @@ function createAsteroids(count) {
             angle: Math.random() * Math.PI * 2,
             zigzag: Math.random() * 2,
             color: "red"
-        };
-        asteroids.push(a);
+        });
     }
 }
 
-// ⭐ Every few seconds asteroids increase
 function increaseAsteroids() {
     if (gameOver || win) return;
-
-    createAsteroids(3.5);   // ⭐ Har step me 5 aur add honge
-
-    // 6–7 second me next increase
+    createAsteroids(4);
     setTimeout(() => increaseAsteroids(), 6000);
 }
 
-window.addEventListener("keydown", (e) => {
-    if (gameOver || win) return;
 
+/* ---------------------------------------------------
+    CONTROLS
+------------------------------------------------------*/
+window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowUp") planet.vy = -speed;
     if (e.key === "ArrowDown") planet.vy = speed;
     if (e.key === "ArrowLeft") planet.vx = -speed;
     if (e.key === "ArrowRight") planet.vx = speed;
 });
-
 window.addEventListener("keyup", (e) => {
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") planet.vy = 0;
-    if (e.key === "ArrowLeft" || e.key === "ArrowRight") planet.vx = 0;
+    if (["ArrowUp", "ArrowDown"].includes(e.key)) planet.vy = 0;
+    if (["ArrowLeft", "ArrowRight"].includes(e.key)) planet.vx = 0;
 });
 
+
+/* ---------------------------------------------------
+    UPDATE PLAYER (ROCKET)
+------------------------------------------------------*/
 function updatePlanet() {
     planet.x += planet.vx;
     planet.y += planet.vy;
 
-    if (planet.x < planet.r) planet.x = planet.r;
-    if (planet.y < planet.r) planet.y = planet.r;
-    if (planet.x > canvas.width - planet.r) planet.x = canvas.width - planet.r;
-    if (planet.y > canvas.height - planet.r) planet.y = canvas.height - planet.r;
+    if (planet.x < 20) planet.x = 20;
+    if (planet.y < 20) planet.y = 20;
+    if (planet.x > canvas.width - 20) planet.x = canvas.width - 20;
+    if (planet.y > canvas.height - 20) planet.y = canvas.height - 20;
 }
 
+
+/* ---------------------------------------------------
+    DRAW ROCKET + OUTLINE
+------------------------------------------------------*/
 function drawPlanet() {
-    ctx.drawImage(shipImg, planet.x - 60, planet.y - 60, 80, 80);
+    ctx.drawImage(shipImg, planet.x - 40, planet.y - 40, 100, 80);
+
+    ctx.fillStyle = "cyan";
+    rocketOutline.forEach(p => {
+        ctx.fillRect(planet.x - 40 + p.x, planet.y - 40 + p.y, 1.5, 1.5);
+    });
 }
 
+
+/* ---------------------------------------------------
+    DRAW ASTEROIDS
+------------------------------------------------------*/
 function drawAsteroids() {
     asteroids.forEach(a => {
         ctx.beginPath();
@@ -287,22 +347,52 @@ function drawAsteroids() {
     });
 }
 
+
+/* ---------------------------------------------------
+    REMOVE OLD COLLISION (FAKE)
+------------------------------------------------------*/
 function checkCollision() {
-    for (let a of asteroids) {
-        let dx = planet.x - a.x;
-        let dy = planet.y - a.y;
-        let dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < planet.r + a.r - 5) {
-            gameOver = true;
-        }
-    }
-
-    if (planet.x > canvas.width - 60) {
+    if (planet.x > canvas.width - 80) {
         win = true;
     }
 }
 
+
+/* ---------------------------------------------------
+    REAL ROCKET OUTLINE COLLISION
+------------------------------------------------------*/
+function checkRocketCollision() {
+    for (let a of asteroids) {
+        for (let p of rocketOutline) {
+
+            const px = planet.x - 40 + p.x;
+            const py = planet.y - 40 + p.y;
+
+            const dx = px - a.x;
+            const dy = py - a.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < a.r) {
+
+                // 🔥 Play blast sound
+                blastSound.currentTime = 0;
+                blastSound.play();
+
+                // 🔇 Stop background music
+                bgMusic.pause();
+
+                gameOver = true;
+                return;
+            }
+        }
+    }
+}
+
+
+
+/* ---------------------------------------------------
+    MAIN GAME LOOP
+------------------------------------------------------*/
 function animate() {
     if (gameOver || win) {
         ctx.fillStyle = "white";
@@ -322,13 +412,16 @@ function animate() {
     drawPlanet();
     drawAsteroids();
     checkCollision();
+    checkRocketCollision();
 
     requestAnimationFrame(animate);
 }
 
 restartBtn.addEventListener("click", resetGame);
+
 resetGame();
 </script>
+
 
 </body>
 </html>
