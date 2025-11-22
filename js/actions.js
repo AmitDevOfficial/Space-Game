@@ -74,6 +74,40 @@ function getImageOutline(image, w, h) {
     return outline;
 }
 
+
+function drawBulletBarHorizontal() {
+    let maxBullets = 30;
+    let barWidth = 250;   // total width of bar
+    let barHeight = 18;   // thickness of bar
+
+    let percent = bulletsCount / maxBullets;
+    let filled = barWidth * percent;
+
+    // Color logic
+    let color = "green";
+    if (percent <= 0.70 && percent > 0.30) color = "yellow";
+    if (percent <= 0.30) color = "red";
+
+    // Bar outline
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(20, 20, barWidth, barHeight);
+
+    // Filled bar
+    ctx.fillStyle = color;
+    ctx.fillRect(20, 20, filled, barHeight);
+
+    // Text
+    ctx.fillStyle = "white";
+    ctx.font = "16px Arial";
+    ctx.fillText(`${bulletsCount}/${maxBullets}`, 20, 60);
+}
+
+
+
+
+
+
 /* ---------------------------------------------------
     CANVAS SIZE
 ------------------------------------------------------*/
@@ -399,8 +433,13 @@ function animate() {
     drawBulletPackage();
     checkBulletPackageCollision();
 
+    drawBulletBarHorizontal();
+
+
     checkCollision();
     checkRocketCollision();
+
+
 
     // draw ammo count for debug
     ctx.fillStyle = "white";
