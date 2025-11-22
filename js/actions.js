@@ -13,7 +13,7 @@ blastSound.volume = 0.9;
 
 // --------- bullet sound ----------
 const bulletSound = new Audio("./sound/gun.wav");
-bulletSound.volume = 0.7;
+bulletSound.volume = 0.2;
 
 let firstPlay = false;
 function enableBGSound() {
@@ -157,7 +157,7 @@ function resetGame() {
     bulletsCount = 0;
     bulletPowerUp = null;
 
-    createAsteroids(5);
+    createAsteroids(3);
     setTimeout(() => increaseAsteroids(), 5000);
 
     spawnBulletPackage(); // ensure a package exists at start
