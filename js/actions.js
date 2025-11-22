@@ -11,22 +11,29 @@ bgMusic.volume = 0.4;
 const blastSound = new Audio("./sound/over.mp3");
 blastSound.volume = 0.9;
 
-let firstPlay = false;
+// --------- bullet sound ----------
+const bulletSound = new Audio("./sound/gun.wav");
+bulletSound.volume = 0.7;
 
+let firstPlay = false;
 function enableBGSound() {
     if (!firstPlay) {
         bgMusic.play().catch(() => {});
         firstPlay = true;
     }
 }
-
 window.addEventListener("click", enableBGSound);
 window.addEventListener("keydown", enableBGSound);
 
+// --------- game / bullets state ----------
+let bulletsCount = 0;
+let bulletPowerUp = null;
 
+let bullets = [];
+let lastShot = 0;
+let shotDelay = 200; // ms
 
 let rocketOutline = [];   // Final pixel outline
-
 
 /* ---------------------------------------------------
     GET PIXEL-BASED OUTLINE FROM ROCKET IMAGE
@@ -67,7 +74,6 @@ function getImageOutline(image, w, h) {
     return outline;
 }
 
-
 /* ---------------------------------------------------
     CANVAS SIZE
 ------------------------------------------------------*/
@@ -78,7 +84,6 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-
 /* ---------------------------------------------------
     GAME VARIABLES
 ------------------------------------------------------*/
@@ -88,7 +93,6 @@ let gameOver;
 let win;
 let speed = 1.7;
 
-
 /* ---------------------------------------------------
     LOAD ROCKET IMAGE
 ------------------------------------------------------*/
@@ -97,7 +101,6 @@ shipImg.onload = () => {
     rocketOutline = getImageOutline(shipImg, 100, 80);
 };
 shipImg.src = "./media/rocket.png";
-
 
 /* ---------------------------------------------------
     RESET GAME
@@ -115,12 +118,19 @@ function resetGame() {
     win = false;
     restartBtn.style.display = "none";
 
+    // reset bullets and powerup
+    bullets = [];
+    bulletsCount = 0;
+    bulletPowerUp = null;
+
     createAsteroids(5);
     setTimeout(() => increaseAsteroids(), 5000);
+
+    spawnBulletPackage(); // ensure a package exists at start
+
     bgMusic.play().catch(() => {});
     animate();
 }
-
 
 /* ---------------------------------------------------
     ASTEROIDS
@@ -134,7 +144,8 @@ function createAsteroids(count) {
             speed: Math.random() * 4 + 1.5,
             angle: Math.random() * Math.PI * 2,
             zigzag: Math.random() * 2,
-            color: "red"
+            color: "red",
+            hit: 0
         });
     }
 }
@@ -145,7 +156,6 @@ function increaseAsteroids() {
     setTimeout(() => increaseAsteroids(), 6000);
 }
 
-
 /* ---------------------------------------------------
     CONTROLS
 ------------------------------------------------------*/
@@ -154,12 +164,33 @@ window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") planet.vy = speed;
     if (e.key === "ArrowLeft") planet.vx = -speed;
     if (e.key === "ArrowRight") planet.vx = speed;
+
+    // shooting on 'A' only if bullets available and cooldown passed
+    if (e.key === "a" || e.key === "A") {
+        const now = Date.now();
+        if (now - lastShot > shotDelay && bulletsCount > 0) {
+            // play sound
+            bulletSound.currentTime = 0;
+            bulletSound.play();
+
+            // create bullet (adjust y-center)
+            bullets.push({
+                x: planet.x + 40,
+                y: planet.y,
+                speed: 10,
+                w: 22,
+                h: 6
+            });
+
+            bulletsCount--;
+            lastShot = now;
+        }
+    }
 });
 window.addEventListener("keyup", (e) => {
     if (["ArrowUp", "ArrowDown"].includes(e.key)) planet.vy = 0;
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) planet.vx = 0;
 });
-
 
 /* ---------------------------------------------------
     UPDATE PLAYER (ROCKET)
@@ -174,7 +205,6 @@ function updatePlanet() {
     if (planet.y > canvas.height - 20) planet.y = canvas.height - 20;
 }
 
-
 /* ---------------------------------------------------
     DRAW ROCKET + OUTLINE
 ------------------------------------------------------*/
@@ -186,7 +216,6 @@ function drawPlanet() {
         ctx.fillRect(planet.x - 40 + p.x, planet.y - 40 + p.y, 1.5, 1.5);
     });
 }
-
 
 /* ---------------------------------------------------
     DRAW ASTEROIDS
@@ -205,10 +234,131 @@ function drawAsteroids() {
         if (a.x < -100) {
             a.x = canvas.width + Math.random() * 500;
             a.y = Math.random() * canvas.height;
+            a.hit = 0;
         }
     });
 }
 
+/* ---------------------------------------------------
+    BULLETS: DRAW + UPDATE
+------------------------------------------------------*/
+function drawBullets() {
+    // iterate backwards to safely splice
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(b.x, b.y - b.h/2, b.w, b.h);
+
+        b.x += b.speed;
+
+        if (b.x > canvas.width + 50) {
+            bullets.splice(i, 1);
+        }
+    }
+}
+
+/* ---------------------------------------------------
+    BULLET PACKAGE (power-up)
+------------------------------------------------------*/
+function spawnBulletPackage() {
+    bulletPowerUp = {
+        x: canvas.width + 100,
+        y: Math.random() * canvas.height,
+        r: 20,
+        speed: 2
+    };
+}
+
+function drawBulletPackage() {
+    if (!bulletPowerUp) return;
+
+    ctx.beginPath();
+    ctx.fillStyle = "gold";
+    ctx.arc(bulletPowerUp.x, bulletPowerUp.y, bulletPowerUp.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // small shine
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.fillRect(bulletPowerUp.x - 6, bulletPowerUp.y - 6, 4, 4);
+
+    bulletPowerUp.x -= bulletPowerUp.speed;
+
+    if (bulletPowerUp.x < -50) {
+        spawnBulletPackage();
+    }
+}
+
+function checkBulletPackageCollision() {
+    if (!bulletPowerUp) return;
+
+    const dx = planet.x - bulletPowerUp.x;
+    const dy = planet.y - bulletPowerUp.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+
+    if (dist < bulletPowerUp.r + 30) {
+        // pickup
+        bulletsCount = 30;
+        bulletPowerUp = null;
+
+        // optional: play pickup sound (if you add)
+        setTimeout(() => {
+            spawnBulletPackage();
+        }, 5000);
+    }
+}
+
+/* ---------------------------------------------------
+    BULLET vs ASTEROID COLLISION
+------------------------------------------------------*/
+function checkBulletCollision() {
+    // iterate bullets backwards and asteroids normally (we can splice asteroids safely too)
+    for (let bi = bullets.length - 1; bi >= 0; bi--) {
+        const b = bullets[bi];
+        for (let ai = asteroids.length - 1; ai >= 0; ai--) {
+            const a = asteroids[ai];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < a.r) {
+                a.hit = (a.hit || 0) + 1;
+
+                // thresholds: big 5, small 2 (you had larger numbers; adjust if you want)
+                const bigThresh = 5;
+                const smallThresh = 2;
+                if ((a.r > 25 && a.hit >= bigThresh) || (a.r <= 25 && a.hit >= smallThresh)) {
+                    asteroids.splice(ai, 1);
+                }
+
+                bullets.splice(bi, 1); // remove bullet and break inner loop
+                break;
+            }
+        }
+    }
+}
+
+/* ---------------------------------------------------
+    COLLISIONS: ROCKET vs ASTEROID (outline)
+------------------------------------------------------*/
+function checkRocketCollision() {
+    for (let a of asteroids) {
+        for (let p of rocketOutline) {
+            const px = planet.x - 40 + p.x;
+            const py = planet.y - 40 + p.y;
+            const dx = px - a.x;
+            const dy = py - a.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < a.r) {
+                blastSound.currentTime = 0;
+                blastSound.play();
+                bgMusic.pause();
+                gameOver = true;
+                return;
+            }
+        }
+    }
+}
 
 /* ---------------------------------------------------
     REMOVE OLD COLLISION (FAKE)
@@ -218,39 +368,6 @@ function checkCollision() {
         win = true;
     }
 }
-
-
-/* ---------------------------------------------------
-    REAL ROCKET OUTLINE COLLISION
-------------------------------------------------------*/
-function checkRocketCollision() {
-    for (let a of asteroids) {
-        for (let p of rocketOutline) {
-
-            const px = planet.x - 40 + p.x;
-            const py = planet.y - 40 + p.y;
-
-            const dx = px - a.x;
-            const dy = py - a.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < a.r) {
-
-                // 🔥 Play blast sound
-                blastSound.currentTime = 0;
-                blastSound.play();
-
-                // 🔇 Stop background music
-                bgMusic.pause();
-
-                gameOver = true;
-                return;
-            }
-        }
-    }
-}
-
-
 
 /* ---------------------------------------------------
     MAIN GAME LOOP
@@ -273,12 +390,27 @@ function animate() {
     updatePlanet();
     drawPlanet();
     drawAsteroids();
+
+    // bullets & collisions
+    drawBullets();
+    checkBulletCollision();
+
+    // powerup
+    drawBulletPackage();
+    checkBulletPackageCollision();
+
     checkCollision();
     checkRocketCollision();
+
+    // draw ammo count for debug
+    ctx.fillStyle = "white";
+    ctx.font = "16px Arial";
+    ctx.fillText("Ammo: " + bulletsCount, 10, 20);
 
     requestAnimationFrame(animate);
 }
 
 restartBtn.addEventListener("click", resetGame);
 
+// start
 resetGame();
