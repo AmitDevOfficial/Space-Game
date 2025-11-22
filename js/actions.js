@@ -2,6 +2,8 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const restartBtn = document.getElementById("restartBtn");
 
+let lastFrameTime = performance.now();
+
 // --------- Background Music ---------
 const bgMusic = new Audio("./sound/space-music.mp3");
 bgMusic.loop = true;
@@ -14,6 +16,9 @@ blastSound.volume = 0.9;
 
 const catchSound = new Audio("./sound/reload.mp3");
 catchSound.volume = 0.8;
+
+//--------Shooter Ss
+
 
 
 // --------- bullet sound ----------
@@ -31,13 +36,13 @@ window.addEventListener("click", enableBGSound);
 window.addEventListener("keydown", enableBGSound);
 
 // --------- game / bullets state ----------
-// play catch sound
-catchSound.currentTime = 0;
-catchSound.play();
+// // play catch sound
+// catchSound.currentTime = 0;
+// catchSound.play();
 
-// refill bullets
-bulletsCount = 30;
-bulletPowerUp = null;
+// // refill bullets
+// bulletsCount = 30;
+// bulletPowerUp = null;
 
 let bullets = [];
 let lastShot = 0;
@@ -239,9 +244,9 @@ window.addEventListener("keyup", (e) => {
 /* ---------------------------------------------------
     UPDATE PLAYER (ROCKET)
 ------------------------------------------------------*/
-function updatePlanet() {
-    planet.x += planet.vx;
-    planet.y += planet.vy;
+function updatePlanet(delta) {
+    planet.x += planet.vx * delta;
+    planet.y += planet.vy * delta;
 
     if (planet.x < 20) planet.x = 20;
     if (planet.y < 20) planet.y = 20;
@@ -264,16 +269,17 @@ function drawPlanet() {
 /* ---------------------------------------------------
     DRAW ASTEROIDS
 ------------------------------------------------------*/
-function drawAsteroids() {
+function drawAsteroids(delta) {
     asteroids.forEach(a => {
         ctx.beginPath();
         ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
         ctx.fillStyle = a.color;
         ctx.fill();
 
-        a.x -= a.speed;
-        a.y += Math.sin(a.angle) * a.zigzag;
-        a.angle += 0.05;
+        a.x -= a.speed * delta;
+        a.y += Math.sin(a.angle) * a.zigzag * delta;
+        a.angle += 0.05 * delta;
+
 
         if (a.x < -100) {
             a.x = canvas.width + Math.random() * 500;
@@ -286,14 +292,14 @@ function drawAsteroids() {
 /* ---------------------------------------------------
     BULLETS: DRAW + UPDATE
 ------------------------------------------------------*/
-function drawBullets() {
+function drawBullets(delta) {
     // iterate backwards to safely splice
     for (let i = bullets.length - 1; i >= 0; i--) {
         const b = bullets[i];
         ctx.fillStyle = "yellow";
         ctx.fillRect(b.x, b.y - b.h/2, b.w, b.h);
 
-        b.x += b.speed;
+        b.x += b.speed * delta;
 
         if (b.x > canvas.width + 50) {
             bullets.splice(i, 1);
@@ -313,7 +319,7 @@ function spawnBulletPackage() {
     };
 }
 
-function drawBulletPackage() {
+function drawBulletPackage(delta) {
     if (!bulletPowerUp) return;
 
     ctx.beginPath();
@@ -325,7 +331,7 @@ function drawBulletPackage() {
     ctx.fillStyle = "rgba(255,255,255,0.6)";
     ctx.fillRect(bulletPowerUp.x - 6, bulletPowerUp.y - 6, 4, 4);
 
-    bulletPowerUp.x -= bulletPowerUp.speed;
+    bulletPowerUp.x -= bulletPowerUp.speed * delta;
 
     if (bulletPowerUp.x < -50) {
         spawnBulletPackage();
@@ -422,7 +428,11 @@ function checkCollision() {
 /* ---------------------------------------------------
     MAIN GAME LOOP
 ------------------------------------------------------*/
-function animate() {
+function animate(time = 0) {
+
+     const delta = (time - lastFrameTime) / 16.67; 
+     lastFrameTime = time;
+
     if (gameOver || win) {
         ctx.fillStyle = "white";
         ctx.font = "50px Arial";
@@ -437,16 +447,16 @@ function animate() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    updatePlanet();
+    updatePlanet(delta);
     drawPlanet();
-    drawAsteroids();
+    drawAsteroids(delta);
 
     // bullets & collisions
-    drawBullets();
+    drawBullets(delta);
     checkBulletCollision();
 
     // powerup
-    drawBulletPackage();
+    drawBulletPackage(delta);
     checkBulletPackageCollision();
 
     drawBulletBarHorizontal();
