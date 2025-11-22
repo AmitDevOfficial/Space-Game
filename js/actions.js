@@ -11,6 +11,11 @@ bgMusic.volume = 0.4;
 const blastSound = new Audio("./sound/over.mp3");
 blastSound.volume = 0.9;
 
+
+const catchSound = new Audio("./sound/reload.mp3");
+catchSound.volume = 0.8;
+
+
 // --------- bullet sound ----------
 const bulletSound = new Audio("./sound/gun.wav");
 bulletSound.volume = 0.2;
@@ -26,8 +31,13 @@ window.addEventListener("click", enableBGSound);
 window.addEventListener("keydown", enableBGSound);
 
 // --------- game / bullets state ----------
-let bulletsCount = 0;
-let bulletPowerUp = null;
+// play catch sound
+catchSound.currentTime = 0;
+catchSound.play();
+
+// refill bullets
+bulletsCount = 30;
+bulletPowerUp = null;
 
 let bullets = [];
 let lastShot = 0;
@@ -330,16 +340,22 @@ function checkBulletPackageCollision() {
     const dist = Math.sqrt(dx*dx + dy*dy);
 
     if (dist < bulletPowerUp.r + 30) {
-        // pickup
+
+        // 🔊 Catch sound
+        catchSound.currentTime = 0;
+        catchSound.play();
+
+        // 🎁 Give 30 bullets
         bulletsCount = 30;
         bulletPowerUp = null;
 
-        // optional: play pickup sound (if you add)
+        // ⏳ Next package spawn after 5 sec
         setTimeout(() => {
             spawnBulletPackage();
         }, 5000);
     }
 }
+
 
 /* ---------------------------------------------------
     BULLET vs ASTEROID COLLISION
