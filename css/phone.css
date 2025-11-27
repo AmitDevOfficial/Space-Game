@@ -1,28 +1,44 @@
-    #rotateWarning {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.9);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    z-index: 9999;
-    text-align: center;
-    padding: 20px;
-}
+   html,
+   body {
+       height: 100%;
+       overflow: hidden;
+       margin: 0;
+       padding: 0;
+   }
 
-@media (orientation: landscape) {
-    #rotateWarning {
-        display: none;
-    }
-}
+   #gameWrapper {
+       width: 100vw;
+       height: 100vh;
+       /* background: black; */
+   }
 
-@media (orientation: portrait) {
-    #rotateWarning {
-        display: flex;
-    }
-}
+
+
+   #rotateWarning {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100vw;
+       height: 100vh;
+       background: rgba(0, 0, 0, 0.9);
+       color: #fff;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       font-size: 24px;
+       z-index: 9999;
+       text-align: center;
+       padding: 20px;
+   }
+
+   @media (orientation: landscape) {
+       #rotateWarning {
+           display: none;
+       }
+   }
+
+   @media (orientation: portrait) {
+       #rotateWarning {
+           display: flex;
+       }
+   }
