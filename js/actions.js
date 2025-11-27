@@ -206,8 +206,8 @@ function createAsteroids(count) {
         asteroids.push({
             x: canvas.width + Math.random() * 400,
             y: Math.random() * canvas.height,
-            r: Math.random() * asteroidBaseRadius + asteroidBaseRadius / 2,  // size chhota ya bada hoga ab
-            speed: (Math.random() * 4 + 1.5) * speedFactor,                  // speed bhi scale hogi
+            r: Math.random() * asteroidBaseRadius + asteroidBaseRadius / 2, // chhota ya bada radius
+            speed: (Math.random() * 4 + 1.5) * speedFactor,  // speed bhi scale hogi
             angle: Math.random() * Math.PI * 2,
             zigzag: Math.random() * 2,
             color: "red",
@@ -215,6 +215,7 @@ function createAsteroids(count) {
         });
     }
 }
+
 
 function increaseAsteroids() {
     if (gameOver || win) return;
@@ -275,14 +276,14 @@ function updatePlanet() {
     DRAW ROCKET + OUTLINE
 ------------------------------------------------------*/
 function drawPlanet() {
-    // Rocket draw karte waqt:
-ctx.drawImage(shipImg, planet.x - rocketWidth / 2, planet.y - rocketHeight / 2, rocketWidth, rocketHeight);
+    ctx.drawImage(shipImg, planet.x - rocketWidth / 2, planet.y - rocketHeight / 2, rocketWidth, rocketHeight);
 
     ctx.fillStyle = "cyan";
     rocketOutline.forEach(p => {
         ctx.fillRect(planet.x - rocketWidth / 2 + p.x, planet.y - rocketHeight / 2 + p.y, 1.5, 1.5);
     });
 }
+
 
 /* ---------------------------------------------------
     DRAW ASTEROIDS
