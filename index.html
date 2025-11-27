@@ -12,35 +12,36 @@
 </head>
 
 <style>
-#fullscreenBtn {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.75);
-    color: white;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size: 18px;
-    z-index: 999999 !important;
-    display: none;
-}
-
-@media (orientation: landscape) {
     #fullscreenBtn {
-        display: block !important;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.75);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-size: 18px;
+        z-index: 999999 !important;
+        display: none;
     }
-}
 
-
-
-
-@media (orientation: portrait) {
-    #fullscreenBtn {
-        display: block;
+    .hidden {
+        display: none !important;
     }
-}
 
+
+    @media (orientation: landscape) {
+        #fullscreenBtn {
+            display: block;
+        }
+    }
+
+    @media (orientation: portrait) {
+        #fullscreenBtn {
+            display: block;
+        }
+    }
 </style>
 
 <body>
@@ -86,13 +87,20 @@
             if (docEl.requestFullscreen) {
                 docEl.requestFullscreen();
             } else if (docEl.webkitRequestFullscreen) {
-                docEl.webkitRequestFullscreen(); // Safari
+                docEl.webkitRequestFullscreen();
             } else if (docEl.msRequestFullscreen) {
                 docEl.msRequestFullscreen();
             }
 
-            fullscreenBtn.style.display = "none"; // Button hide after fullscreen
+            fullscreenBtn.classList.add('hidden');
         });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.classList.remove('hidden');
+            }
+        });
+
     </script>
     <script>
         screen.orientation.lock("landscape").catch(() => { });

@@ -6,6 +6,9 @@ function enterFullScreen() {
     else if (body.msRequestFullscreen) body.msRequestFullscreen();
 }
 
+
+
+
 function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
     const rotateWarning = document.getElementById("rotateWarning");
