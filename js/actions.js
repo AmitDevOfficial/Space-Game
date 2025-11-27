@@ -7,6 +7,7 @@ const bgMusic = new Audio("./sound/space-music.mp3");
 bgMusic.loop = true;
 bgMusic.volume = 0.4;
 
+
 // --------- blast Music ---------
 const blastSound = new Audio("./sound/over.mp3");
 blastSound.volume = 0.9;
@@ -23,7 +24,7 @@ bulletSound.volume = 0.2;
 let firstPlay = false;
 function enableBGSound() {
     if (!firstPlay) {
-        bgMusic.play().catch(() => {});
+        bgMusic.play().catch(() => { });
         firstPlay = true;
     }
 }
@@ -114,10 +115,6 @@ function drawBulletBarHorizontal() {
 }
 
 
-
-
-
-
 /* ---------------------------------------------------
     CANVAS SIZE
 ------------------------------------------------------*/
@@ -128,6 +125,30 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
+
+const screenWidth = window.innerWidth;
+
+let asteroidBaseRadius;
+let rocketWidth;
+let rocketHeight;
+let speedFactor;
+
+if (screenWidth < 600) {
+    asteroidBaseRadius = 15;
+    rocketWidth = 40;
+    rocketHeight = 10;
+    speedFactor = 0.5;
+} else {
+    asteroidBaseRadius = 40;
+    rocketWidth = 100;
+    rocketHeight = 80;
+    speedFactor = 1;
+}
+
+
+
+
+
 /* ---------------------------------------------------
     GAME VARIABLES
 ------------------------------------------------------*/
@@ -135,14 +156,15 @@ let planet;
 let asteroids;
 let gameOver;
 let win;
-let speed = 1.7;
+let speed = 1.7 * speedFactor;
 
 /* ---------------------------------------------------
     LOAD ROCKET IMAGE
 ------------------------------------------------------*/
 const shipImg = new Image();
+// Rocket outline banate waqt:
 shipImg.onload = () => {
-    rocketOutline = getImageOutline(shipImg, 100, 80);
+    rocketOutline = getImageOutline(shipImg, rocketWidth, rocketHeight);
 };
 shipImg.src = "./media/rocket.png";
 
@@ -172,7 +194,7 @@ function resetGame() {
 
     spawnBulletPackage(); // ensure a package exists at start
 
-    bgMusic.play().catch(() => {});
+    bgMusic.play().catch(() => { });
     animate();
 }
 
@@ -184,8 +206,8 @@ function createAsteroids(count) {
         asteroids.push({
             x: canvas.width + Math.random() * 400,
             y: Math.random() * canvas.height,
-            r: Math.random() * 30 + 15,
-            speed: Math.random() * 4 + 1.5,
+            r: Math.random() * asteroidBaseRadius + asteroidBaseRadius / 2,  // size chhota ya bada hoga ab
+            speed: (Math.random() * 4 + 1.5) * speedFactor,                  // speed bhi scale hogi
             angle: Math.random() * Math.PI * 2,
             zigzag: Math.random() * 2,
             color: "red",
@@ -253,11 +275,12 @@ function updatePlanet() {
     DRAW ROCKET + OUTLINE
 ------------------------------------------------------*/
 function drawPlanet() {
-    ctx.drawImage(shipImg, planet.x - 40, planet.y - 40, 100, 80);
+    // Rocket draw karte waqt:
+ctx.drawImage(shipImg, planet.x - rocketWidth / 2, planet.y - rocketHeight / 2, rocketWidth, rocketHeight);
 
     ctx.fillStyle = "cyan";
     rocketOutline.forEach(p => {
-        ctx.fillRect(planet.x - 40 + p.x, planet.y - 40 + p.y, 1.5, 1.5);
+        ctx.fillRect(planet.x - rocketWidth / 2 + p.x, planet.y - rocketHeight / 2 + p.y, 1.5, 1.5);
     });
 }
 
@@ -291,7 +314,7 @@ function drawBullets() {
     for (let i = bullets.length - 1; i >= 0; i--) {
         const b = bullets[i];
         ctx.fillStyle = "yellow";
-        ctx.fillRect(b.x, b.y - b.h/2, b.w, b.h);
+        ctx.fillRect(b.x, b.y - b.h / 2, b.w, b.h);
 
         b.x += b.speed;
 
@@ -337,7 +360,7 @@ function checkBulletPackageCollision() {
 
     const dx = planet.x - bulletPowerUp.x;
     const dy = planet.y - bulletPowerUp.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dist = Math.sqrt(dx * dx + dy * dy);
 
     if (dist < bulletPowerUp.r + 30) {
 
