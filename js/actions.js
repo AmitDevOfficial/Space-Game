@@ -134,9 +134,9 @@ let rocketHeight;
 let speedFactor;
 
 if (screenWidth < 600) {
-    asteroidBaseRadius = 12;
-    rocketWidth = 50;
-    rocketHeight = 30;
+    asteroidBaseRadius = 8;
+    rocketWidth = 30;
+    rocketHeight = 15;
     speedFactor = 0.3;
 } else {
     asteroidBaseRadius = 30;
