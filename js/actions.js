@@ -126,26 +126,25 @@ resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 
+
 const screenWidth = window.innerWidth;
 
-let asteroidBaseRadius;
-let rocketWidth;
-let rocketHeight;
-let speedFactor;
+    let asteroidBaseRadius;
+    let rocketWidth;
+    let rocketHeight;
+    let speedFactor;
 
-if (screenWidth < 600) {
-    asteroidBaseRadius = 4;
-    rocketWidth = 10;
-    rocketHeight = 5;
-    speedFactor = 0.1;
-} else {
-    asteroidBaseRadius = 30;
-    rocketWidth = 100;
-    rocketHeight = 80;
-    speedFactor = 1;
-}
-
-
+    if (screenWidth < 600) {
+        asteroidBaseRadius = 20;
+        rocketWidth = 40;
+        rocketHeight = 20;
+        speedFactor = 0.1;
+    } else {
+        asteroidBaseRadius = 30;
+        rocketWidth = 100;
+        rocketHeight = 80;
+        speedFactor = 1;
+    }
 
 
 
