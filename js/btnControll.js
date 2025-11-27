@@ -6,13 +6,28 @@ function moveRight() { planet.vx =  speed; }
 function stopX() { planet.vx = 0; }
 function stopY() { planet.vy = 0; }
 
-document.querySelector(".up").addEventListener("mousedown", moveUp);
-document.querySelector(".down").addEventListener("mousedown", moveDown);
-document.querySelector(".left").addEventListener("mousedown", moveLeft);
-document.querySelector(".right").addEventListener("mousedown", moveRight);
+/* Helper: Add PC + Mobile events together */
+function addControl(btn, startFn, stopFn) {
+    const el = document.querySelector(btn);
 
-document.querySelector(".up").addEventListener("mouseup", stopY);
-document.querySelector(".down").addEventListener("mouseup", stopY);
-document.querySelector(".left").addEventListener("mouseup", stopX);
-document.querySelector(".right").addEventListener("mouseup", stopX);
+    // PC events
+    el.addEventListener("mousedown", startFn);
+    el.addEventListener("mouseup", stopFn);
+    el.addEventListener("mouseleave", stopFn);
+
+    // Mobile events
+    el.addEventListener("touchstart", (e) => {
+        e.preventDefault();  // to stop double-touch issues
+        startFn();
+    });
+    el.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        stopFn();
+    });
+}
+
+addControl(".up", moveUp, stopY);
+addControl(".down", moveDown, stopY);
+addControl(".left", moveLeft, stopX);
+addControl(".right", moveRight, stopX);
 /* ------------------ Control Buttons -------------------- */
