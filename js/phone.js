@@ -1,18 +1,20 @@
-        function checkOrientation() {
+function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
 
-    const canvas = document.getElementById("gameCanvas");
+    const rotateWarning = document.getElementById("rotateWarning");
+    const gameCanvas = document.getElementById("gameCanvas");
 
     if (isPortrait) {
-        canvas.style.display = "none"; // Gameplay hide
-        // Optionally: Pause game loop here
+        rotateWarning.style.display = "flex";
+        gameCanvas.style.display = "none";  
     } else {
-        canvas.style.display = "block"; // Gameplay visible
-        // Optionally: Resume game loop here
+        rotateWarning.style.display = "none";
+        gameCanvas.style.display = "block";  
     }
 }
 
+// Resize se hamesha fire hota hai (LOCK on ho tab bhi)
 window.addEventListener("resize", checkOrientation);
-window.addEventListener("orientationchange", checkOrientation);
 
+// Page load pe bhi check karo
 checkOrientation();
