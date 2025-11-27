@@ -1,11 +1,14 @@
-function enableFullScreen() {
+function goFullScreen() {
     const canvas = document.getElementById("gameCanvas");
 
+    // Sab browsers ke liye support
     if (canvas.requestFullscreen) {
         canvas.requestFullscreen();
-    } else if (canvas.webkitRequestFullscreen) {
-        canvas.webkitRequestFullscreen(); // Safari
-    } else if (canvas.msRequestFullscreen) {
+    } 
+    else if (canvas.webkitRequestFullscreen) {
+        canvas.webkitRequestFullscreen(); // iPhone Safari
+    }
+    else if (canvas.msRequestFullscreen) {
         canvas.msRequestFullscreen();
     }
 }
@@ -13,18 +16,18 @@ function enableFullScreen() {
 function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
     const rotateWarning = document.getElementById("rotateWarning");
-    const gameCanvas = document.getElementById("gameCanvas");
+    const canvas = document.getElementById("gameCanvas");
 
     if (isPortrait) {
         rotateWarning.style.display = "flex";
-        gameCanvas.style.display = "none";
+        canvas.style.display = "none";
     } else {
         rotateWarning.style.display = "none";
-        gameCanvas.style.display = "block";
+        canvas.style.display = "block";
 
-        // User ke first touch par fullscreen
-        canvas.addEventListener("touchstart", enableFullScreen, { once: true });
-        canvas.addEventListener("click", enableFullScreen, { once: true });
+        // First touch → fullscreen
+        canvas.addEventListener("touchend", goFullScreen, { once: true });
+        canvas.addEventListener("click", goFullScreen, { once: true });
     }
 }
 
