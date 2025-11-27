@@ -11,6 +11,38 @@
     <title>Planet Asteroid Game</title>
 </head>
 
+<style>
+#fullscreenBtn {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size: 18px;
+    z-index: 999999 !important;
+    display: none;
+}
+
+@media (orientation: landscape) {
+    #fullscreenBtn {
+        display: block !important;
+    }
+}
+
+
+
+
+@media (orientation: portrait) {
+    #fullscreenBtn {
+        display: block;
+    }
+}
+
+</style>
+
 <body>
     <div id="rotateWarning">
         <p>Please rotate your phone</p>

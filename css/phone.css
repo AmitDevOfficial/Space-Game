@@ -12,21 +12,6 @@
        /* background: black; */
    }
 
-#fullscreenBtn {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.8);
-  padding: 20px 30px;
-  color: white;
-  font-size: 22px;
-  border-radius: 10px;
-  display: none;
-  z-index: 9999;
-}
-
-
    #rotateWarning {
        position: fixed;
        top: 0;
