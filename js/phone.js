@@ -1,33 +1,27 @@
-function goFullScreen() {
-    const wrapper = document.getElementById("gameWrapper");
+function enterFullScreen() {
+    const body = document.body;
 
-    if (wrapper.requestFullscreen) {
-        wrapper.requestFullscreen();
-    } else if (wrapper.webkitRequestFullscreen) {
-        wrapper.webkitRequestFullscreen();
-    } else if (wrapper.msRequestFullscreen) {
-        wrapper.msRequestFullscreen();
-    }
+    if (body.requestFullscreen) body.requestFullscreen();
+    else if (body.webkitRequestFullscreen) body.webkitRequestFullscreen();
+    else if (body.msRequestFullscreen) body.msRequestFullscreen();
 }
-
 
 function checkOrientation() {
     const isPortrait = window.innerHeight > window.innerWidth;
     const rotateWarning = document.getElementById("rotateWarning");
-    const wrapper = document.getElementById("gameWrapper");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
 
     if (isPortrait) {
         rotateWarning.style.display = "flex";
-        wrapper.style.display = "none";
+        fullscreenBtn.style.display = "none";
     } else {
         rotateWarning.style.display = "none";
-        wrapper.style.display = "block";
+        fullscreenBtn.style.display = "block";
 
-        wrapper.addEventListener("touchend", goFullScreen, { once: true });
-        wrapper.addEventListener("click", goFullScreen, { once: true });
+        fullscreenBtn.addEventListener("click", enterFullScreen, { once: true });
+        fullscreenBtn.addEventListener("touchend", enterFullScreen, { once: true });
     }
 }
 
 window.addEventListener("resize", checkOrientation);
 checkOrientation();
-

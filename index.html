@@ -21,12 +21,15 @@
     </video>
 
     <button id="restartBtn">Restart Game</button>
+    <div id="fullscreenBtn">Tap to Enter Fullscreen</div>
 
     <div class="start-line"></div>
     <div class="end-line"></div>
     <div id="gameWrapper">
         <canvas id="gameCanvas"></canvas>
     </div>
+
+
 
     <!-- --------------Button Controls----------- -->
     <div id="controls">
@@ -40,10 +43,30 @@
 
     <script src="js/btnControll.js"></script>
     <script src="js/actions.js"></script>
+
+
     <script>
+        const fullscreenBtn = document.getElementById("fullscreenBtn");
 
+        fullscreenBtn.addEventListener("click", () => {
+            const docEl = document.documentElement;
 
+            if (docEl.requestFullscreen) {
+                docEl.requestFullscreen();
+            } else if (docEl.webkitRequestFullscreen) {
+                docEl.webkitRequestFullscreen(); // Safari
+            } else if (docEl.msRequestFullscreen) {
+                docEl.msRequestFullscreen();
+            }
+
+            fullscreenBtn.style.display = "none"; // Button hide after fullscreen
+        });
     </script>
+    <script>
+        screen.orientation.lock("landscape").catch(() => { });
+    </script>
+
+
 
 </body>
 
