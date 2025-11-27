@@ -137,7 +137,7 @@ if (screenWidth < 600) {
     asteroidBaseRadius = 8;
     rocketWidth = 30;
     rocketHeight = 15;
-    speedFactor = 0.3;
+    speedFactor = 0.1;
 } else {
     asteroidBaseRadius = 30;
     rocketWidth = 100;
