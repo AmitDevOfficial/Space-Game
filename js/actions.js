@@ -126,7 +126,7 @@ resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 
-
+let hitboxScale;
 const screenWidth = window.visualViewport.width;
 
 // setTimeout(() => {
@@ -135,11 +135,13 @@ const screenWidth = window.visualViewport.width;
         rocketWidth = 60;
         rocketHeight = 40;
         speedFactor = 0.35;
+        hitboxScale = 0.4; 
     } else {
         asteroidBaseRadius = 30;
         rocketWidth = 100;
         rocketHeight = 80;
         speedFactor = 1;
+        hitboxScale = 1;     
     }
 // }, 50);
 
