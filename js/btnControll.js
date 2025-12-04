@@ -1,33 +1,43 @@
-/* ------------------ Control Buttons -------------------- */
-function moveUp() { planet.vy = -speed; }
-function moveDown() { planet.vy =  speed; }
-function moveLeft() { planet.vx = -speed; }
-function moveRight() { planet.vx =  speed; }
-function stopX() { planet.vx = 0; }
-function stopY() { planet.vy = 0; }
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
 
-/* Helper: Add PC + Mobile events together */
-function addControl(btn, startFn, stopFn) {
-    const el = document.querySelector(btn);
+let joyActive = false;
+let centerX, centerY;
 
-    // PC events
-    el.addEventListener("mousedown", startFn);
-    el.addEventListener("mouseup", stopFn);
-    el.addEventListener("mouseleave", stopFn);
+joystick.addEventListener("touchstart", (e) => {
+    joyActive = true;
+    const rect = joystick.getBoundingClientRect();
+    centerX = rect.left + rect.width / 2;
+    centerY = rect.top + rect.height / 2;
+});
 
-    // Mobile events
-    el.addEventListener("touchstart", (e) => {
-        e.preventDefault();  // to stop double-touch issues
-        startFn();
-    });
-    el.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        stopFn();
-    });
-}
+joystick.addEventListener("touchmove", (e) => {
+    if (!joyActive) return;
 
-addControl(".up", moveUp, stopY);
-addControl(".down", moveDown, stopY);
-addControl(".left", moveLeft, stopX);
-addControl(".right", moveRight, stopX);
-/* ------------------ Control Buttons -------------------- */
+    const touch = e.touches[0];
+    const dx = touch.clientX - centerX;
+    const dy = touch.clientY - centerY;
+
+    const distance = Math.min(40, Math.sqrt(dx*dx + dy*dy));
+    const angle = Math.atan2(dy, dx);
+
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+
+    stick.style.transform = `translate(${x}px, ${y}px)`;
+
+    // ---- Movement control send to your game ----
+    if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 10) moveRight();
+        else if (dx < -10) moveLeft();
+    } else {
+        if (dy > 10) moveDown();
+        else if (dy < -10) moveUp();
+    }
+});
+
+joystick.addEventListener("touchend", () => {
+    joyActive = false;
+    stick.style.transform = `translate(0,0)`;
+});
+
