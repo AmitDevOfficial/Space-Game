@@ -127,25 +127,21 @@ window.addEventListener("resize", resizeCanvas);
 
 
 
-const screenWidth = window.innerWidth;
+const screenWidth = window.visualViewport.width;
 
-    let asteroidBaseRadius;
-    let rocketWidth;
-    let rocketHeight;
-    let speedFactor;
-
+// setTimeout(() => {
     if (screenWidth < 600) {
         asteroidBaseRadius = 15;
         rocketWidth = 60;
         rocketHeight = 40;
-        speedFactor = 0.2;
+        speedFactor = 0.25;
     } else {
         asteroidBaseRadius = 30;
         rocketWidth = 100;
         rocketHeight = 80;
         speedFactor = 1;
     }
-
+// }, 50);
 
 
 /* ---------------------------------------------------
@@ -196,6 +192,9 @@ function resetGame() {
     bgMusic.play().catch(() => { });
     animate();
 }
+
+
+
 
 /* ---------------------------------------------------
     ASTEROIDS
