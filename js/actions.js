@@ -134,7 +134,7 @@ const screenWidth = window.visualViewport.width;
         asteroidBaseRadius = 15;
         rocketWidth = 60;
         rocketHeight = 40;
-        speedFactor = 0.25;
+        speedFactor = 0.35;
     } else {
         asteroidBaseRadius = 30;
         rocketWidth = 100;
