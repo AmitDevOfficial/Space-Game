@@ -135,10 +135,10 @@ const screenWidth = window.innerWidth;
     let speedFactor;
 
     if (screenWidth < 600) {
-        asteroidBaseRadius = 20;
+        asteroidBaseRadius = 15;
         rocketWidth = 60;
         rocketHeight = 40;
-        speedFactor = 0.4;
+        speedFactor = 0.2;
     } else {
         asteroidBaseRadius = 30;
         rocketWidth = 100;
