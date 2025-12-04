@@ -478,7 +478,8 @@ function animate() {
     checkCollision();
     checkRocketCollision();
 
-
+    planet.x += joystickX * speed;
+    planet.y += joystickY * speed;
 
     // draw ammo count for debug
     ctx.fillStyle = "white";
