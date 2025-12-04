@@ -99,3 +99,28 @@
     left: 35px;
     transition: 0.05s linear;
 }
+
+
+/* ------------Fire Button---------- */
+#fireBtn {
+    position: fixed;
+    bottom: 50px;
+    left: 40px;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    color: white;
+    z-index: 99999;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+    user-select: none;
+}
+#fireBtn:active {
+    transform: scale(0.9);
+    background: rgb(209, 105, 105);
+}

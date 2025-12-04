@@ -225,6 +225,41 @@ function increaseAsteroids() {
 /* ---------------------------------------------------
     CONTROLS
 ------------------------------------------------------*/
+const fireBtn = document.getElementById("fireBtn");
+
+// mobile ke liye
+fireBtn.addEventListener("touchstart", () => {
+    shootBullet();
+});
+
+// PC ke liye
+fireBtn.addEventListener("mousedown", () => {
+    shootBullet();
+});
+
+
+function shootBullet() {
+    const now = Date.now();
+    if (now - lastShot > shotDelay && bulletsCount > 0) {
+
+        bulletSound.currentTime = 0;
+        bulletSound.play();
+
+        bullets.push({
+            x: planet.x + 40,
+            y: planet.y,
+            speed: 10,
+            w: 22,
+            h: 6
+        });
+
+        bulletsCount--;
+        lastShot = now;
+    }
+}
+
+
+
 window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowUp") planet.vy = -speed;
     if (e.key === "ArrowDown") planet.vy = speed;
@@ -232,26 +267,10 @@ window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") planet.vx = speed;
 
     // shooting on 'A' only if bullets available and cooldown passed
-    if (e.key === "a" || e.key === "A") {
-        const now = Date.now();
-        if (now - lastShot > shotDelay && bulletsCount > 0) {
-            // play sound
-            bulletSound.currentTime = 0;
-            bulletSound.play();
+   if (e.key === "a" || e.key === "A") {
+    shootBullet();   // ← yahi call karega bullet fire
+   }
 
-            // create bullet (adjust y-center)
-            bullets.push({
-                x: planet.x + 40,
-                y: planet.y,
-                speed: 10,
-                w: 22,
-                h: 6
-            });
-
-            bulletsCount--;
-            lastShot = now;
-        }
-    }
 });
 window.addEventListener("keyup", (e) => {
     if (["ArrowUp", "ArrowDown"].includes(e.key)) planet.vy = 0;
