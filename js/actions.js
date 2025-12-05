@@ -127,22 +127,26 @@ window.addEventListener("resize", resizeCanvas);
 
 
 let hitboxScale;
+let maxAsteroids;
 const screenWidth = window.visualViewport.width;
 
+// setTimeout(() => {
     if (screenWidth < 600) {
+        maxAsteroids = 10;   // Mobile → Medium
         asteroidBaseRadius = 15;
         rocketWidth = 60;
         rocketHeight = 40;
         speedFactor = 0.35;
         hitboxScale = 0.4; 
     } else {
+        maxAsteroids = 25;   // PC → Hard
         asteroidBaseRadius = 30;
         rocketWidth = 100;
         rocketHeight = 80;
         speedFactor = 1;
         hitboxScale = 1;     
     }
-
+// }, 50);
 
 
 /* ---------------------------------------------------
@@ -186,18 +190,7 @@ function resetGame() {
     bulletPowerUp = null;
 
     createAsteroids(3);
-
-
-    function increaseAsteroids() {
-    if (gameOver || win) return;
-
-    let addCount = (screenWidth < 600) ? 3 : 6;  // mobile = slower spawn
-    let delay = (screenWidth < 600) ? 3000 : 600;  // mobile = slower rate
-
-    createAsteroids(addCount);
-    setTimeout(() => increaseAsteroids(), delay);
-}
-
+    setTimeout(() => increaseAsteroids(), 5000);
 
     spawnBulletPackage(); // ensure a package exists at start
 
@@ -206,6 +199,25 @@ function resetGame() {
 }
 
 
+function increaseAsteroids() {
+    if (gameOver || win) return;
+
+    let addCount;
+    let delay;
+
+    if (screenWidth < 600) {
+        // 📱 Mobile = Medium Mode
+        addCount = 2;       // ek baar me 2 asteroids
+        delay = 9000;       // 9 sec me new asteroids
+    } else {
+        // 💻 PC = Hard Mode
+        addCount = 5;       // ek baar me 5 asteroids
+        delay = 5000;       // 5 sec me new asteroids
+    }
+
+    createAsteroids(addCount);
+    setTimeout(increaseAsteroids, delay);
+}
 
 
 /* ---------------------------------------------------
@@ -213,6 +225,10 @@ function resetGame() {
 ------------------------------------------------------*/
 function createAsteroids(count) {
     for (let i = 0; i < count; i++) {
+
+        // ⭐ Ye most important line — asteroid limit
+        if (asteroids.length >= maxAsteroids) return;
+
         asteroids.push({
             x: canvas.width + Math.random() * 400,
             y: Math.random() * canvas.height,
@@ -503,6 +519,7 @@ function animate() {
     checkBulletPackageCollision();
 
     drawBulletBarHorizontal();
+
 
     checkCollision();
     checkRocketCollision();
