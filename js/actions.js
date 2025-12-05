@@ -492,6 +492,9 @@ function checkCollision() {
     MAIN GAME LOOP
 ------------------------------------------------------*/
 function animate() {
+    if (window.innerHeight > window.innerWidth) {
+        return; // game stop, kuch bhi draw nahi hoga
+    }
     if (gameOver || win) {
         ctx.fillStyle = "white";
         ctx.font = "50px Arial";

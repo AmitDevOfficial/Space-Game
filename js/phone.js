@@ -55,8 +55,6 @@ function checkOrientation() {
     }
 }
 
-
-
 window.addEventListener("resize", checkOrientation);
 window.addEventListener("orientationchange", checkOrientation);
 window.addEventListener("load", checkOrientation);
