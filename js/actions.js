@@ -492,7 +492,7 @@ function checkCollision() {
     MAIN GAME LOOP
 ------------------------------------------------------*/
 function animate() {
-    
+
     if (window.innerHeight > window.innerWidth) {
         return;
     }
@@ -540,7 +540,20 @@ function animate() {
     requestAnimationFrame(animate);
 }
 
+
+let gameStarted = false;
+
+const playBtn = document.getElementById("playBtn");
+
+playBtn.addEventListener("click", () => {
+    playBtn.style.display = "none";
+    gameStarted = true;
+    resetGame();   // Game ONLY starts here
+});
+
+// restart works normally
 restartBtn.addEventListener("click", resetGame);
 
-// start
-resetGame();
+// ❗Run animation loop ONCE so canvas always draws
+requestAnimationFrame(animate);
+

@@ -11,48 +11,16 @@
     <title>Planet Asteroid Game</title>
 </head>
 
-<style>
-    #fullscreenBtn {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.75);
-        color: white;
-        padding: 15px 25px;
-        border-radius: 10px;
-        font-size: 18px;
-        z-index: 999999 !important;
-        display: none;
-    }
-
-    .hidden {
-        display: none !important;
-    }
-
-
-    @media (orientation: landscape) {
-        #fullscreenBtn {
-            display: block;
-        }
-    }
-
-    @media (orientation: portrait) {
-        #fullscreenBtn {
-            display: block;
-        }
-    }
-</style>
-
 <body>
     <div id="rotateWarning">
         <p>Please rotate your phone</p>
     </div>
-   
+
     <video id="bgVideo" autoplay loop muted playsinline>
         <source src="media/bgBackground.mp4" type="video/mp4">
     </video>
-
+    
+    <button id="playBtn">Play Game</button>
     <button id="restartBtn">Restart Game</button>
     <div id="fullscreenBtn">Tap to Enter Fullscreen</div>
 
@@ -75,32 +43,8 @@
 
     <script src="js/btnControll.js"></script>
     <script src="js/actions.js"></script>
+    <script src="js/phone.js"></script>
 
-
-    <script>
-        const fullscreenBtn = document.getElementById("fullscreenBtn");
-
-        fullscreenBtn.addEventListener("click", () => {
-            const docEl = document.documentElement;
-
-            if (docEl.requestFullscreen) {
-                docEl.requestFullscreen();
-            } else if (docEl.webkitRequestFullscreen) {
-                docEl.webkitRequestFullscreen();
-            } else if (docEl.msRequestFullscreen) {
-                docEl.msRequestFullscreen();
-            }
-
-            fullscreenBtn.classList.add('hidden');
-        });
-
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                fullscreenBtn.classList.remove('hidden');
-            }
-        });
-
-    </script>
     <script>
         screen.orientation.lock("landscape").catch(() => { });
     </script>

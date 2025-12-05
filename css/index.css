@@ -48,9 +48,23 @@
         display: block;
     }
 
+    #playBtn {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 15px 30px;
+    font-size: 22px;
+    border-radius: 10px;
+    background: black;
+    color: white;
+    z-index: 999999;
+}
+
+
     #restartBtn {
         position: fixed;
-        top: 20px;
+        top: 30px;
         left: 50%;
         transform: translateX(-50%);
         padding: 12px 25px;
