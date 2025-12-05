@@ -191,8 +191,8 @@ function resetGame() {
     function increaseAsteroids() {
     if (gameOver || win) return;
 
-    let addCount = (screenWidth < 600) ? 2 : 4;  // mobile = slower spawn
-    let delay = (screenWidth < 600) ? 9000 : 6000;  // mobile = slower rate
+    let addCount = (screenWidth < 600) ? 3 : 6;  // mobile = slower spawn
+    let delay = (screenWidth < 600) ? 3000 : 600;  // mobile = slower rate
 
     createAsteroids(addCount);
     setTimeout(() => increaseAsteroids(), delay);
