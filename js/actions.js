@@ -129,7 +129,6 @@ window.addEventListener("resize", resizeCanvas);
 let hitboxScale;
 const screenWidth = window.visualViewport.width;
 
-// setTimeout(() => {
     if (screenWidth < 600) {
         asteroidBaseRadius = 15;
         rocketWidth = 60;
@@ -143,7 +142,7 @@ const screenWidth = window.visualViewport.width;
         speedFactor = 1;
         hitboxScale = 1;     
     }
-// }, 50);
+
 
 
 /* ---------------------------------------------------
@@ -187,7 +186,18 @@ function resetGame() {
     bulletPowerUp = null;
 
     createAsteroids(3);
-    setTimeout(() => increaseAsteroids(), 5000);
+
+
+    function increaseAsteroids() {
+    if (gameOver || win) return;
+
+    let addCount = (screenWidth < 600) ? 2 : 4;  // mobile = slower spawn
+    let delay = (screenWidth < 600) ? 9000 : 6000;  // mobile = slower rate
+
+    createAsteroids(addCount);
+    setTimeout(() => increaseAsteroids(), delay);
+}
+
 
     spawnBulletPackage(); // ensure a package exists at start
 
@@ -493,7 +503,6 @@ function animate() {
     checkBulletPackageCollision();
 
     drawBulletBarHorizontal();
-
 
     checkCollision();
     checkRocketCollision();
